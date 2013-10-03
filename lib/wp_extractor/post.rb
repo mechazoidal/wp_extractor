@@ -29,8 +29,16 @@ module WpExtractor
       self.comments_dataset.filter(:comment_type=>'').order(:comment_date_gmt).reverse
     end
 
+    def safe_title
+      self.post_title.downcase.gsub(/\W/, '-')
+    end
+
     def html_title
       "<h1>#{self.post_title}</h1>"
+    end
+
+    def html_posted_at
+      "<h2>#{self.post_date.strftime("%Y-%m-%d")}</h2>"
     end
 
     def safe_content

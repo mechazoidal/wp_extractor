@@ -6,7 +6,10 @@ gem 'nokogiri'
 gem 'htmlentities'
 gem 'trollop'
 
-gem 'ripl'
-gem 'ripl-commands'
-gem 'ripl-multi_line'
-gem 'ripl-rc'
+# if you want the instarepl script to work..
+group :shell do
+  gem 'ripl'
+  gem 'ripl-commands'
+  gem 'ripl-multi_line'
+  gem 'ripl-rc'
+end

@@ -14,15 +14,14 @@ require 'sequel'
 
 Sequel.connect(opts[:sql_url])
 
-require '../lib/wp_extractor'
+require_relative 'wp_extractor'
 require 'nokogiri'
 
 def output(post, output_directory, publish_time=true)
-  safe_title = post.post_title.downcase.gsub(/\W/, '-')
-  filename = publish_time ? "#{post.post_date.strftime("%Y-%m-%d")}-#{safe_title}" : safe_title
+  filename = publish_time ? "#{post.post_date.strftime("%Y-%m-%d")}-#{post.safe_title}" : post.safe_title
 
   File.open(File.join(output_directory, "#{filename}.html"), 'w') do |f|
-    content = Nokogiri.HTML(post.html_title + post.safe_content)
+    content = Nokogiri.HTML(post.html_title + post.html_posted_at + post.safe_content)
     f << content.to_html
   end
 
