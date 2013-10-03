@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'bundler/setup'
+
+require 'sequel'
+require 'nokogiri'
+
+Sequel.connect('mysql://devuser:devuser@localhost/kp_blog')
+
+require '../lib/wp_extractor'
+
+require 'ripl'
+
+Ripl.start

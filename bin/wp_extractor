@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'bundler/setup'
+
+require 'trollop'
+
+opts = Trollop.options do
+  opt :sql_url, "connect string for mysql", :type=>:string, :required=>true
+  opt :output_directory, "where to put output files", :type=>:string, :required=>true
+end
+
+
+require 'sequel'
+
+Sequel.connect(opts[:sql_url])
+
+require '../lib/wp_extractor'
+require 'nokogiri'
+
+def output(post, output_directory, publish_time=true)
+  safe_title = post.post_title.downcase.gsub(/\W/, '-')
+  filename = publish_time ? "#{post.post_date.strftime("%Y-%m-%d")}-#{safe_title}" : safe_title
+
+  File.open(File.join(output_directory, "#{filename}.html"), 'w') do |f|
+    content = Nokogiri.HTML(post.html_title + post.safe_content)
+    f << content.to_html
+  end
+
+  if(post.attached_comments.count > 0)
+    File.open(File.join(output_directory, "#{filename}_comments.md"), 'w') do |f|
+      f << post.comments_dataset.collect{|c| c.to_markdown}.join("\n---\n")
+    end
+  end
+end
+
+WpExtractor::Post.published.pages.each do |page|
+  output(page, opts[:output_directory], false)
+end
+
+WpExtractor::Post.published.posts.each do |post|
+  output(post, opts[:output_directory], true)
+end
